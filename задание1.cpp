@@ -4,22 +4,22 @@
 #include <iomanip>
 #include <Windows.h>
 using namespace std;
-const float E = 0.0001;
+const double E = 0.0001;
 //𝑥 𝑙𝑛( 𝑥 + 1) = 1
-float f(float x) {
+double f(double x) {
 	return (x * log(x + 1) - 1);
 }
-float f1(float x) {
+double f1(double x) {
 	return x / (x + 1) + log(x + 1);
 }
 //методом половинного деления
-void halfDivision(float a, float b) {
+int halfDivision(double a, double b, vector<double>& roots) {
 	if (f(a) * f(b) >= 0.0) {
 		cout << "Неверный интервал" << endl;
-		return;
+		return 0;
 	}
 	int k = 0;
-	float c = 0;
+	double c = 0;
 	while (abs(b - a) >= E) {
 		cout << setw(7) << k << "|" << setw(8) << fixed << setprecision(4) << a << " | " << setw(8) << b << "|" << b - a << endl;
 		c = (a + b) / 2;
@@ -34,46 +34,55 @@ void halfDivision(float a, float b) {
 		}
 		k++;
 	}
-
+	roots.push_back(c);
 	cout << "Корень " << c << " с " << k << " итерациями" << endl;
+	return k;
 }
 //Метод Ньютона
-void newtonMethod(int a, int b, float x0) {
-	if (f(a) * f(b) >= 0.0) {
-		cout << "Неверный интервал" << endl;
-		return;
-	}
+int newtonMethod(double x0, vector<double>& roots) {
 	int k = 0;
-	float x1 = x0 - f(x0) / f1(x0);
+	double x1 = x0 - f(x0) / f1(x0);
 	while (abs(x1 - x0) >= E) {
 		cout << setw(7) << k << "|" << setw(8) << fixed << setprecision(4) << x0 << " | " << setw(8) << x1 << "|" << x1 - x0 << endl;
 		x0 = x1;
 		x1 = x0 - f(x0) / f1(x0);
 		k++;
 	}
+	roots.push_back(x0);
 	cout << "Корень " << x0 << " с " << k << " итерациями" << endl;
+	return k;
 }
 //метода простых итераций
-void simpleIterations(float x0) {
+int simpleIterations(double x0, vector<double>& roots) {
 	int k = 0;
-	float x1 = 1 / log(x0 + 1);
+	double x1 = 1 / log(x0 + 1);
 	while (abs(x1 - x0) > E) {
 		cout << setw(7) << k << "|" << setw(8) << fixed << setprecision(4) << x0 << " | " << setw(8) << x1 << "|" << x1 - x0 << endl;
 		x0 = x1;
 		x1 = 1 / log(x0 + 1);
 		k++;
 	}
+	roots.push_back(x0);
 	cout << "Корень " << x0 << " с " << k << " итерациями" << endl;
+	return k;
 }
 
 int main() {
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 	cout << "программу уточнения корня методом половинного деления с точностью до E" << endl;
-	halfDivision(-1, 1);
+	vector<double> roots;
+	int s1 = halfDivision(-1, 1, roots);
 	cout << endl << "программу уточнения корня Ньютоном с точностью до E" << endl;
-	newtonMethod(-10, 10, 10);
+	int s2 = newtonMethod(10, roots);
 	cout << endl << "метода простых итераций" << endl;
-	simpleIterations(2);
+	int s3 = simpleIterations(2, roots);
+	cout << endl << "все корни уравнения" << endl;
+	for (double i : roots) {
+		cout << i << " ";
+	}
+	cout << endl << "Скорость сходимости: " << endl;
+	cout << endl << "У Ньютона  " << s2 << " итераций" << endl;
+	cout << endl << "У метода простых итераций  " << s3 << " итераций" << endl;
+	cout << endl << "У  методом половинного деления " << s1 << " итераций" << endl;
 }
-
